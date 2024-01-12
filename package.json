@@ -14,12 +14,14 @@
   "scripts": {
     "dev": "ts-node-dev --transpile-only src/server.ts",
     "typeorm": "typeorm-ts-node-commonjs -d ./src/data-source.ts",
-    "docker:run":  "docker run -p 5000:5000 -d --name node-server-app node-server",
+    "docker:run": "docker run -p 5000:5000 -d --name node-server-app node-server",
     "docker:build": "docker build . --tag node-server"
-    
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@typescript-eslint/eslint-plugin": "^6.18.1",
+    "@typescript-eslint/parser": "^6.18.1",
+    "eslint": "^8.56.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
   }
