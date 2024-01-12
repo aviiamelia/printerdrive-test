@@ -1,12 +1,10 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import { Column, Entity, OneToMany } from "typeorm";
 import { GeneratedIdModel } from "./baseModel";
 import { Folder } from "./folderModel";
 
+@Entity("users")
 export class UserModel extends GeneratedIdModel {
-  @Column({ name: "user" })
-  name: string;
-
-  @Column({ unique: true })
+  @Column()
   username: string;
 
   @Column({ unique: true })
