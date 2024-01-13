@@ -6,12 +6,18 @@ export class UserService {
   constructor(private readonly bcrypt: BcryptAdapter) {}
 
   async create(data: IUser) {
-    const repository = UserRepo();
+    const userRepo = UserRepo();
     const hashPassword = this.bcrypt.hash(data.password);
     data.password = hashPassword;
-    const user = repository.create(data);
-    await repository.save(user);
+    const user = userRepo.create(data);
+    await userRepo.save(user);
     const { password: erase, ...response } = user;
     return response;
+  }
+  async list() {
+    const userRepo = UserRepo();
+    const users = await userRepo.find();
+    users.map((user) => delete user.password);
+    return users;
   }
 }
