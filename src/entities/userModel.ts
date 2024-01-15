@@ -1,6 +1,7 @@
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany } from "typeorm";
 import { GeneratedIdModel } from "./baseModel";
 import { Folder } from "./folderModel";
+import { PermissionModel } from "./permissionModel";
 
 @Entity("users")
 export class UserModel extends GeneratedIdModel {
@@ -14,5 +15,12 @@ export class UserModel extends GeneratedIdModel {
   password: string;
 
   @OneToMany(() => Folder, (folder) => folder.user)
+  @JoinColumn()
   folders: Folder[];
+
+  @OneToMany(() => PermissionModel, (permission) => permission.user)
+  permissions: PermissionModel[];
+
+  @Column({ default: false })
+  isAdmin?: boolean;
 }

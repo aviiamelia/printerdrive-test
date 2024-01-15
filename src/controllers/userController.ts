@@ -3,6 +3,7 @@ import { UserService } from "../services/user.services";
 import { BcryptAdapter } from "../adapters/bcrypt.adapter";
 import { DuplicatedKey } from "../errorHandler/älredyExistError";
 import { AccessDeniedError } from "../errorHandler/accessDeniedError";
+import { UserModel } from "../entities/userModel";
 
 export class UserController {
   constructor() {}
@@ -10,7 +11,7 @@ export class UserController {
   async create(req: Request, res: Response) {
     try {
       const userService = new UserService(new BcryptAdapter());
-      const data = req.body;
+      const data: UserModel = req.body;
       const user = await userService.create(data);
       res.status(201).send(user);
     } catch (error) {
