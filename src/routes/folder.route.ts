@@ -11,18 +11,21 @@ const router = Router();
 const controller = new FolderController();
 export const folderRouter = () => {
   router.post("", validate(folderSchema), isAuthenticated, controller.create);
+  router.get("", isAuthenticated, controller.listFolders);
   router.post(
     "/upload/:folderId",
     isAuthenticated,
-    upload.single("file"),
+    upload.array("files"),
     controller.uploadFile
   );
   router.delete("/:folderId", isAuthenticated, controller.deleteFolder);
+  router.patch("/:folderId", isAuthenticated, controller.updateFolder);
   router.patch(
     "/:folderId/:userId/:permissionType",
     isAuthenticated,
     isAdiminstrator,
     controller.giveFolderPermission
   );
+  router.get("/download/:folderId", controller.downloadFolder);
   return router;
 };

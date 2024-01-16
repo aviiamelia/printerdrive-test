@@ -9,6 +9,7 @@ import {
 import { UserModel } from "./userModel";
 import { GeneratedIdModel } from "./baseModel";
 import { PermissionModel } from "./permissionModel";
+import { FileModel } from "./filesModel";
 
 @Entity()
 export class Folder extends GeneratedIdModel {
@@ -22,8 +23,9 @@ export class Folder extends GeneratedIdModel {
   @JoinColumn()
   user: UserModel;
 
-  @Column({ nullable: true })
-  contentFilePath: string;
+  @JoinColumn()
+  @OneToMany(() => FileModel, (file) => file.folder, { cascade: true })
+  files!: File[]; // Add this line to define the 'files' property
 
   @ManyToOne(() => Folder, (folder) => folder.childFolders, { nullable: true })
   parentFolder: Folder;

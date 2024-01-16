@@ -5,9 +5,10 @@ import { UserRepo } from "../repository/user.repository";
 import { UserModel } from "../entities/userModel";
 import { PermissionRepo } from "../repository/permissions.repository";
 import { PermissionModel, PermissionType } from "../entities/permissionModel";
-import { NoFileUpload } from "../errorHandler/noFileUpaloaded";
 import { AccessDeniedError } from "../errorHandler/accessDeniedError";
 import { NotFoundError } from "../errorHandler/notFoundError";
+import { FileRepo } from "../repository/file.repositoru";
+import { FileModel } from "../entities/filesModel";
 
 export class FolderService {
   async create(folderName: string, parentFolderId?: number, ownerId?: number) {
@@ -42,15 +43,12 @@ export class FolderService {
   }
   async uploadFile(
     foldId: number,
-    file: unknown,
     currentUserId: number,
-    isAdmin: boolean
+    isAdmin: boolean,
+    uploadedFiles: Express.Multer.File[]
   ) {
     const folderRepo = FolderRepo();
-    const uploadFile = file;
-    if (!uploadFile) {
-      throw new NoFileUpload();
-    }
+    const fileRepo = FileRepo();
     const permissionRepo = PermissionRepo();
     let isAllowed = false;
     const permissionsToDelete = await permissionRepo.find({
@@ -76,7 +74,14 @@ export class FolderService {
     }
     if (isAllowed) {
       const folder = await folderRepo.findOneByOrFail({ id: foldId });
-      folder.contentFilePath = uploadFile as string;
+      for (const uploadedFile of uploadedFiles) {
+        const file = new FileModel();
+        file.fileName = uploadedFile.originalname;
+        file.filePath = "uploads/" + uploadedFile.originalname; // Replace with your actual saving logic
+        file.folder = folder;
+
+        await fileRepo.save(file);
+      }
       await folderRepo.save(folder);
       return folder;
     } else {
@@ -146,6 +151,63 @@ export class FolderService {
       permission.folder = folder;
       permission.permissionType = permissionType;
       await permissionRepo.save(permission);
+    }
+  }
+  async downloadFolder(folderId: number) {
+    const fileRepo = FileRepo();
+    const folderRepo = FolderRepo();
+    const folder = await folderRepo.findOne({
+      where: { id: folderId },
+      relations: ["files"],
+    });
+    const files = await fileRepo.find({ where: { folder: { id: folderId } } });
+    const zipFileName = folder.folderName;
+    return { files, zipFileName };
+  }
+  async listFolders(userId: number) {
+    const folderRepo = FolderRepo();
+    const folders = await folderRepo.find({
+      where: { permissions: { user: { id: userId } } },
+      relations: ["files"],
+    });
+    return folders;
+  }
+  async updateFolder(
+    folderId: number,
+    newFolderName: string,
+    currentUserId: number,
+    isAdmin: boolean
+  ) {
+    const folderRepo = FolderRepo();
+    const permissionRepo = PermissionRepo();
+    let isAllowed = false;
+    const permissionsToDelete = await permissionRepo.find({
+      where: { folder: { id: folderId } },
+      relations: ["user.permissions"],
+    });
+    if (permissionsToDelete.length === 0) {
+      throw new NotFoundError();
+    }
+    if (!isAllowed) {
+      permissionsToDelete.map((permission) => {
+        if (
+          permission.user.id === currentUserId &&
+          permission.permissionType === PermissionType.FULL
+        ) {
+          isAllowed = true;
+        }
+      });
+    }
+    if (isAdmin) {
+      isAllowed = true;
+    }
+    if (isAllowed) {
+      const folder = await folderRepo.findOne({ where: { id: folderId } });
+      folder.folderName = newFolderName;
+      folderRepo.save(folder);
+      return folder;
+    } else {
+      throw new AccessDeniedError();
     }
   }
 }
