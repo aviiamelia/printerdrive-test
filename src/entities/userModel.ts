@@ -18,7 +18,10 @@ export class UserModel extends GeneratedIdModel {
   @JoinColumn()
   folders: Folder[];
 
-  @OneToMany(() => PermissionModel, (permission) => permission.user)
+  @OneToMany(() => PermissionModel, (permission) => permission.user, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn()
   permissions: PermissionModel[];
 
   @Column({ default: false })

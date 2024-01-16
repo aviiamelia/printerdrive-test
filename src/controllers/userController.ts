@@ -23,11 +23,12 @@ export class UserController {
     }
   }
 
-  async list(_, res: Response) {
+  async list(req: Request, res: Response) {
     try {
       const userService = new UserService(new BcryptAdapter());
       const users = await userService.list();
       res.status(200).send(users);
+
       return users;
     } catch (error) {
       if (error instanceof AccessDeniedError) {

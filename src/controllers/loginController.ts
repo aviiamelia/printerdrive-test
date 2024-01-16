@@ -15,8 +15,8 @@ export class LoginController {
         new BcryptAdapter(),
         new JwtAdapter(secret, expiresIn)
       );
-      const token = await loginService.login(req.body);
-      res.status(200).send({ token: token });
+      const response = await loginService.login(req.body);
+      res.status(200).send({ response });
     } catch (error) {
       res.status(401).send({ message: "wrong email/password" });
     }
