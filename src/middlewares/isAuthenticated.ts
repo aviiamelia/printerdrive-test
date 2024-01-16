@@ -14,8 +14,12 @@ export const isAuthenticated = (
   const token = req.headers.authorization.split(" ")[1];
   const jwt = new JwtAdapter(process.env.JWT_SECRET, process.env.EXPIRESIN);
   const verification = jwt.verify(token);
+  const decoded = jwt.decode(token);
+  delete decoded.data.password;
+  req.user = decoded.data;
   if (!verification) {
-    throw new AccessDeniedError();
+    const error = new AccessDeniedError();
+    res.status(401).send({ error: error.message });
   } else {
     return next();
   }

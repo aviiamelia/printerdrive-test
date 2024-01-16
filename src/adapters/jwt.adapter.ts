@@ -1,4 +1,4 @@
-import { sign, verify, decode as jwtdecode } from "jsonwebtoken";
+import { sign, verify, decode as jwtdecode, JwtPayload } from "jsonwebtoken";
 import {
   jwtAdapterInterface,
   userData,
@@ -23,6 +23,6 @@ export class JwtAdapter implements jwtAdapterInterface {
   }
   decode(token: string) {
     const decode = jwtdecode(token);
-    return decode;
+    return decode as JwtPayload;
   }
 }

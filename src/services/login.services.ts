@@ -17,7 +17,12 @@ export class LoginService {
       throw new AccessDeniedError();
     }
     const token = this.jwt.generateToken(user);
-
-    return token;
+    console.log(user);
+    const decoded = this.jwt.decode(token);
+    delete decoded.data.password;
+    return {
+      token,
+      userData: decoded,
+    };
   }
 }

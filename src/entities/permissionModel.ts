@@ -2,7 +2,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
-  OneToOne,
   JoinColumn,
   Column,
 } from "typeorm";
@@ -21,9 +20,10 @@ export class PermissionModel {
   id: number;
 
   @ManyToOne(() => UserModel, (user) => user.permissions)
+  @JoinColumn()
   user: UserModel;
 
-  @OneToOne(() => Folder)
+  @ManyToOne(() => Folder, { onDelete: "CASCADE" })
   @JoinColumn()
   folder: Folder;
 

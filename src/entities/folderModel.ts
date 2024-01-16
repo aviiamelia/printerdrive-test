@@ -18,7 +18,7 @@ export class Folder extends GeneratedIdModel {
   @Column({ unique: false })
   folderName: string;
 
-  @ManyToOne(() => UserModel, (user) => user.folders)
+  @ManyToOne(() => UserModel, (user) => user.folders, { onDelete: "CASCADE" })
   @JoinColumn()
   user: UserModel;
 
@@ -31,6 +31,8 @@ export class Folder extends GeneratedIdModel {
   @OneToMany(() => Folder, (folder) => folder.parentFolder)
   childFolders: Folder[];
 
-  @OneToMany(() => PermissionModel, (permission) => permission.folder)
+  @OneToMany(() => PermissionModel, (permission) => permission.folder, {
+    onDelete: "CASCADE",
+  })
   permissions: PermissionModel[];
 }
