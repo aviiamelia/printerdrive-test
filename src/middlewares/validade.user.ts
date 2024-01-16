@@ -10,6 +10,7 @@ export const validate =
       await schema.validate(data, { abortEarly: true, stripUnknown: true });
       return next();
     } catch (e: any) {
+      console.log(e);
       res.status(400).json({ error: e.errors.join(", ") });
     }
   };

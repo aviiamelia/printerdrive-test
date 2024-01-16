@@ -1,10 +1,10 @@
 import { Express } from "express";
-
-export const list = async (req, res) => {
-  res.send({ title: "hellow" });
-};
+import { userRouter } from "./users.route";
+import { loginRouter } from "./login.route";
+import { folderRouter } from "./folder.route";
 
 export const routerInit = (app: Express) => {
-  app.use("/users", list);
-  app.use("/login", () => null);
+  app.use("/users", userRouter());
+  app.use("/login", loginRouter());
+  app.use("/folder", folderRouter());
 };

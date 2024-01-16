@@ -1,11 +1,8 @@
 export interface IUser {
-  name: string;
+  username: string;
   password: string;
   email: string;
-  isAdm: boolean;
-  uuid?: string;
-  createOn?: Date;
-  updatedOn?: Date;
+  id: number;
 }
 
 export interface ILogin {
