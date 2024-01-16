@@ -21,6 +21,7 @@ export class UserService {
         "permissions",
         "permissions.folder",
         "permissions.folder.childFolders",
+        "permissions.folder.files",
       ],
     });
     users.map((user) => delete user.password);
