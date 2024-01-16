@@ -17,7 +17,11 @@ export class UserService {
   async list() {
     const userRepo = UserRepo();
     const users = await userRepo.find({
-      relations: ["folders"],
+      relations: [
+        "permissions",
+        "permissions.folder",
+        "permissions.folder.childFolders",
+      ],
     });
     users.map((user) => delete user.password);
     return users;

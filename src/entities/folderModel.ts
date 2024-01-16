@@ -15,7 +15,7 @@ export class Folder extends GeneratedIdModel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: false })
   folderName: string;
 
   @ManyToOne(() => UserModel, (user) => user.folders)

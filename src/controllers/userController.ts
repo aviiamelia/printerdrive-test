@@ -34,6 +34,7 @@ export class UserController {
         const error = new AccessDeniedError();
         res.status(404).send({ error: error.message });
       } else {
+        console.log(error);
         res.status(400).send({ error: "bad request" });
       }
     }

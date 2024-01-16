@@ -5,6 +5,7 @@ import { UserRepo } from "../repository/user.repository";
 import { UserModel } from "../entities/userModel";
 import { PermissionRepo } from "../repository/permissions.repository";
 import { PermissionModel, PermissionType } from "../entities/permissionModel";
+import { NoFileUpload } from "../errorHandler/noFileUpaloaded";
 
 export class FolderService {
   async create(folderName: string, parentFolderId?: number, ownerId?: number) {
@@ -19,23 +20,34 @@ export class FolderService {
         folderName: folderName,
         user: user as UserModel,
       });
-      console.log(folder);
       folderRepo.save(folder);
       permission.user = user;
       permission.folder = folder;
       permission.permissionType = PermissionType.FULL;
       await permissionRepo.save(permission);
+      return folder;
     } else {
       const subFolder = new Folder();
+      subFolder.user = user;
       const parentFolder = await folderRepo.findOne({
         where: { id: parentFolderId },
       });
       subFolder.folderName = folderName;
       subFolder.parentFolder = parentFolder;
-
       await folderRepo.save(subFolder);
-      const folder = folderRepo.create();
-      await folderRepo.save(folder);
+      return subFolder;
     }
+  }
+  async uploadFile(foldId: number, file: unknown) {
+    const folderId = foldId;
+    const folderRepo = FolderRepo();
+    const uploadFile = file;
+    if (!uploadFile) {
+      throw new NoFileUpload();
+    }
+    const folder = await folderRepo.findOneByOrFail({ id: folderId });
+    folder.contentFilePath = uploadFile as string;
+    await folderRepo.save(folder);
+    return folder;
   }
 }
