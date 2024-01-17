@@ -30,14 +30,21 @@ export class FolderService {
       await permissionRepo.save(permission);
       return folder;
     } else {
-      const subFolder = new Folder();
+      const subFolder = folderRepo.create({
+        folderName: folderName,
+        user: user as UserModel,
+      });
       subFolder.user = user;
       const parentFolder = await folderRepo.findOne({
         where: { id: parentFolderId },
       });
+      folderRepo.save(subFolder);
+      permission.user = user;
+      permission.folder = subFolder;
+      permission.permissionType = PermissionType.FULL;
       subFolder.folderName = folderName;
       subFolder.parentFolder = parentFolder;
-      await folderRepo.save(subFolder);
+      await permissionRepo.save(permission);
       return subFolder;
     }
   }
@@ -167,9 +174,34 @@ export class FolderService {
   async listFolders(userId: number) {
     const folderRepo = FolderRepo();
     const folders = await folderRepo.find({
-      where: { permissions: { user: { id: userId } } },
-      relations: ["files"],
+      where: {
+        permissions: { user: { id: userId }, folder: { user: { id: userId } } },
+      },
+      relations: ["files", "childFolders"],
     });
+    folders.map((folder) => {
+      folder.childFolders.map((child) => {
+        const found = folders.find((fold) => fold.id === child.id);
+        if (found) {
+          const index = folders.indexOf(found);
+          folders.splice(index, 1);
+        }
+      });
+    });
+    return folders;
+  }
+  async listSharedFolders(userId: number) {
+    const folderRepo = FolderRepo();
+    const permissionRepo = PermissionRepo();
+
+    const folders = await folderRepo
+      .createQueryBuilder("folder")
+      .leftJoinAndSelect("folder.user", "user")
+      .leftJoin("folder.permissions", "permission")
+      .andWhere("folder.user.id != :id", { id: userId })
+      .andWhere("permission.user.id = :id", { id: userId })
+      .getMany();
+
     return folders;
   }
   async updateFolder(
