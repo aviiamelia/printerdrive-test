@@ -6,12 +6,12 @@ import { FileModel } from "./entities/filesModel";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: "localhost",
+  host: "postgres",
   port: 5432,
   username: "postgres",
   synchronize: true,
-  password: "postgres",
-  database: "postgres",
+  password: "password",
+  database: "printerdrive",
   entities: [UserModel, Folder, PermissionModel, FileModel],
   migrations: ["src/database/migrations/**/*{.ts,.js}"],
   subscribers: ["src/database/subscriber/**/*{.ts,.js}"],

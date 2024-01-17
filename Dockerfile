@@ -1,15 +1,20 @@
-FROM node:18.0.0  As development
+# Use an official Node.js runtime as a base image
+FROM node:14
 
+# Set the working directory in the container
 WORKDIR /usr/src/app
 
-COPY --chown=node:node package*.json ./
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
 
+# Install app dependencies
 RUN npm install
 
-COPY --chown=node:node . .
+# Bundle app source code
+COPY . .
 
-USER node
-
+# Expose the port your app will run on
 EXPOSE 5000
 
-CMD [ "npm", "run", "dev" ]
+# Command to run your application
+CMD ["npm", "run","dev"]
