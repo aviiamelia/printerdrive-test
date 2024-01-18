@@ -26,4 +26,15 @@ export class FileController {
       res.status(400).send({ message: "bad request" });
     }
   }
+  async listFiles(req: Request, res: Response) {
+    const filesService = new FilesSevice();
+    try {
+      const folderId = parseInt(req.params.folderId);
+      const response = await filesService.listFiles(folderId);
+      res.status(200).send(response);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({ message: "bad request" });
+    }
+  }
 }
