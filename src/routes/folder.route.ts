@@ -12,6 +12,7 @@ const controller = new FolderController();
 export const folderRouter = () => {
   router.post("", validate(folderSchema), isAuthenticated, controller.create);
   router.get("", isAuthenticated, controller.listFolders);
+  router.get("/sharedfolders", isAuthenticated, controller.listSharedFolders);
   router.post(
     "/upload/:folderId",
     isAuthenticated,

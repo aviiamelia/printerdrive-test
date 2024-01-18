@@ -127,7 +127,6 @@ export class FolderController {
     try {
       const folderId = parseInt(req.params.folderId);
       const data = await folderService.downloadFolder(folderId);
-
       const zipFilePath = path.join(
         __dirname,
         "..",
@@ -139,7 +138,9 @@ export class FolderController {
         "Content-Disposition",
         `attachment; filename="${data.zipFileName}.zip"`
       );
-
+      if (!fs.existsSync(zipFilePath)) {
+        fs.mkdirSync(zipFilePath);
+      }
       fs.readdirSync(zipFilePath);
       const archive = archiver("zip", { zlib: { level: 0 } });
       archive.pipe(res);
@@ -168,6 +169,17 @@ export class FolderController {
     try {
       const userId = req.user.id;
       const response = await folderService.listFolders(userId);
+      res.status(200).send(response);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({ message: "bad request" });
+    }
+  }
+  async listSharedFolders(req: Request, res: Response) {
+    const folderService = new FolderService();
+    try {
+      const userId = req.user.id;
+      const response = await folderService.listSharedFolders(userId);
       res.status(200).send(response);
     } catch (error) {
       console.log(error);

@@ -1,0 +1,1 @@
+Para rodar a aplicaçao, basta ter docker instalado na maquina e roda docker-compose up
